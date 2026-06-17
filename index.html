@@ -4,23 +4,20 @@
     <meta charset="UTF-8">
     <title>현장 체감온도</title>
     <style>
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; font-family: sans-serif; margin: 0; }
-        #weather-box { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 350px; }
-        #temp-display { font-size: 4rem; font-weight: 800; color: #333; margin: 10px 0; }
-        #status-label { font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; }
-        #details { color: #7f8c8d; font-size: 0.9rem; margin-top: 10px; }
+        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f2f5; font-family: 'Pretendard', sans-serif; margin: 0; }
+        #weather-box { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 400px; }
+        
+        /* 레이아웃 정렬 */
+        h1 { color: #2c3e50; font-size: 1.4rem; margin-bottom: 20px; }
+        #status-label { font-size: 1.2rem; font-weight: bold; margin: 0; }
+        #temp-display { font-size: 4rem; font-weight: 800; margin: 10px 0; }
+        #details { color: #7f8c8d; font-size: 0.9rem; border-top: 1px solid #eee; padding-top: 15px; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center; color: #2c3e50; margin-top: 20px;">써밋클라비온현장 실시간 체감온도</h1>
-    
+
     <div id="weather-box">
-        <h2 id="status-label">--</h2>
-        <div id="temp-display">--°C</div>
-        <p id="details">데이터 불러오는 중...</p>
-    </div>
-    
-    <div id="weather-box">
+        <h1>써밋클라비온현장<br>실시간 체감온도</h1>
         <h2 id="status-label">--</h2>
         <div id="temp-display">--°C</div>
         <p id="details">데이터 불러오는 중...</p>
@@ -57,11 +54,11 @@
                     else if (heatIndex < 38) { statusText = "경고"; statusColor = "#e67e22"; }
                     else { statusText = "폭염 중대경보"; statusColor = "#e74c3c"; }
 
-                    document.getElementById("temp-display").innerText = `${heatIndex}°C`;
-                    document.getElementById("temp-display").style.color = statusColor;
                     document.getElementById("status-label").innerText = statusText;
                     document.getElementById("status-label").style.color = statusColor;
-                    document.getElementById("details").innerText = `기온 ${T1H}°C | 습도 ${REH}% | 풍속 ${WSD}m/s`;
+                    document.getElementById("temp-display").innerText = `${heatIndex}°C`;
+                    document.getElementById("temp-display").style.color = statusColor;
+                    document.getElementById("details").innerText = `현재기온 ${T1H}°C | 습도 ${REH}% | 풍속 ${WSD}m/s`;
                 });
         }
         updateWeather();
