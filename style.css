@@ -1,4 +1,0 @@
-body { display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; font-family: 'Pretendard', sans-serif; }
-#weather-box { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 350px; }
-#temp-display { font-size: 4rem; font-weight: 800; color: #e74c3c; margin: 10px 0; }
-#details { color: #7f8c8d; font-size: 0.9rem; }
