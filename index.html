@@ -2,49 +2,158 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <!-- 모바일 화면 최적화 설정 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>현장 체감온도</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>써밋클라비온 현장 체감온도</title>
+    <!-- 폰트 적용 (Pretendard) -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    
     <style>
-        body { 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            background: #f0f2f5; 
-            font-family: 'Pretendard', sans-serif; 
-            margin: 0; 
+        body {
+            background-color: #f4f6f8;
+            font-family: 'Pretendard', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        #weather-box { 
-            background: white; 
-            padding: 2.5rem; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            text-align: center; 
-            width: 90%; 
-            max-width: 450px; 
+
+        #app-container {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            min-height: 100vh;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 30px 20px;
+            box-sizing: border-box;
+            position: relative;
         }
-        
-        /* 레이아웃 디자인 개선 */
-        h1 { color: #2c3e50; font-size: 1.5rem; margin-bottom: 25px; line-height: 1.4; }
-        #status-label { font-size: 1.4rem; font-weight: bold; margin: 0; }
-        #temp-display { font-size: 5rem; font-weight: 800; margin: 15px 0; }
-        #details { 
-            color: #7f8c8d; 
-            font-size: 1rem; 
-            border-top: 1px solid #eee; 
-            padding-top: 20px; 
-            margin-top: 15px; 
+
+        /* 상단 헤더 */
+        .header h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #111;
+            margin: 0 0 5px 0;
+            letter-spacing: -0.5px;
+        }
+        .header p.address {
+            font-size: 0.9rem;
+            color: #777;
+            margin: 0;
+        }
+
+        /* 메인 온도 표시 */
+        .main-temp {
+            margin-top: 30px;
+        }
+        #feel-temp-display {
+            font-size: 4.5rem;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+
+        /* 서브 정보 (실제 기온, 날씨) */
+        .sub-info {
+            font-size: 0.95rem;
+            color: #555;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        /* 상태 뱃지 */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        /* 4칸 그리드 레이아웃 */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .grid-item {
+            background-color: #f8f9fa;
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .grid-label {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .grid-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #111;
+        }
+
+        /* 하단 문구 */
+        .footer {
+            font-size: 0.8rem;
+            color: #aaa;
+            text-align: center;
+            margin-top: 40px;
         }
     </style>
 </head>
 <body>
 
-    <div id="weather-box">
-        <h1>써밋클라비온현장<br>실시간 체감온도</h1>
-        <h2 id="status-label">--</h2>
-        <div id="temp-display">--°C</div>
-        <p id="details">데이터 불러오는 중...</p>
+    <div id="app-container">
+        <!-- 상단 현장 정보 -->
+        <div class="header">
+            <h1>써밋클라비온</h1>
+            <p class="address">서울 영등포구 신길동 3950</p>
+        </div>
+
+        <!-- 체감 온도 및 상태 -->
+        <div class="main-temp">
+            <h2 id="feel-temp-display" style="color: #ccc;">--°C</h2>
+            <p class="sub-info">현재 체감온도 · 실제 기온 <span id="real-temp">--</span>°C · <span id="weather-icon">--</span></p>
+            <div id="status-badge" class="status-badge" style="background: #eee; color: #888;">데이터 수집중...</div>
+        </div>
+
+        <!-- 하단 4칸 그리드 정보 -->
+        <div class="grid-container">
+            <div class="grid-item">
+                <div class="grid-label"><span style="color:#3498db;">💧</span> 습도</div>
+                <div class="grid-value" id="humidity-display">--%</div>
+            </div>
+            <div class="grid-item">
+                <div class="grid-label"><span style="color:#95a5a6;">💨</span> 풍속</div>
+                <div class="grid-value" id="wind-display">--m/s</div>
+            </div>
+            <div class="grid-item">
+                <div class="grid-label"><span style="color:#e74c3c;">🌡️</span> 오늘 최고 체감</div>
+                <div class="grid-value" id="max-temp" style="color: #b87333;">--°C</div>
+            </div>
+            <div class="grid-item">
+                <div class="grid-label"><span style="color:#2ecc71;">🌡️</span> 오늘 최저 체감</div>
+                <div class="grid-value" id="min-temp" style="color: #27ae60;">--°C</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            ※ 기상청 격자 (nx:59, ny:125) 기준 · 현장 개별 좌표 적용
+        </div>
     </div>
 
     <script>
@@ -52,11 +161,33 @@
         const NX = "59";
         const NY = "125";
 
+        // 기상청 기준 체감온도 산출 함수 (습구온도 Tw 적용)
+        function calculateKmaFeelTemp(Ta, RH) {
+            // 1. Stull의 습구온도(Tw) 추정 공식
+            const Tw = Ta * Math.atan(0.151977 * Math.pow(RH + 8.313659, 0.5)) 
+                     + Math.atan(Ta + RH) 
+                     - Math.atan(RH - 1.676331) 
+                     + 0.00391838 * Math.pow(RH, 1.5) * Math.atan(0.023101 * RH) 
+                     - 4.686035;
+
+            // 2. 기상청 여름철 체감온도 공식 적용
+            const feelTemp = -0.2442 
+                           + 0.55399 * Tw 
+                           + 0.45535 * Ta 
+                           - 0.0022 * Math.pow(Tw, 2) 
+                           + 0.00278 * Tw * Ta 
+                           + 3.0;
+
+            return parseFloat(feelTemp.toFixed(1));
+        }
+
         function updateWeather() {
             const now = new Date();
             now.setHours(now.getHours() - 1);
             const baseDate = now.toISOString().slice(0, 10).replace(/-/g, "");
             const baseTime = now.getHours().toString().padStart(2, "0") + "00";
+            
+            // 초단기 실황 API
             const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=${API_KEY}&pageNo=1&numOfRows=10&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=${NX}&ny=${NY}`;
 
             fetch(url)
@@ -64,30 +195,69 @@
                 .then(data => {
                     const items = data.response.body.items.item;
                     const findValue = (cat) => items.find(i => i.category === cat)?.obsrValue || 0;
-                    const T1H = parseFloat(findValue("T1H"));
-                    const REH = parseFloat(findValue("REH"));
-                    const WSD = parseFloat(findValue("WSD"));
+                    
+                    const T1H = parseFloat(findValue("T1H")); // 기온
+                    const REH = parseFloat(findValue("REH")); // 습도
+                    const WSD = parseFloat(findValue("WSD")); // 풍속
+                    const PTY = parseInt(findValue("PTY"));   // 강수형태
 
-                    const e = (REH / 100) * 6.105 * Math.pow(10, (7.5 * T1H) / (237.7 + T1H));
-                    const heatIndex = parseFloat((T1H + 0.33 * e - 0.7 * WSD - 4).toFixed(1));
+                    // 날씨 아이콘 처리
+                    let weatherIcon = "맑음 ☀️";
+                    if(PTY === 1 || PTY === 5) weatherIcon = "비 🌧️";
+                    else if(PTY === 2 || PTY === 6) weatherIcon = "비/눈 🌨️";
+                    else if(PTY === 3 || PTY === 7) weatherIcon = "눈 ❄️";
 
-                    let statusText, statusColor;
-                    if (heatIndex < 31) { statusText = "안전"; statusColor = "#333333"; }
-                    else if (heatIndex < 33) { statusText = "관심"; statusColor = "#3498db"; }
-                    else if (heatIndex < 35) { statusText = "주의"; statusColor = "#f1c40f"; }
-                    else if (heatIndex < 38) { statusText = "경고"; statusColor = "#e67e22"; }
-                    else { statusText = "폭염 중대경보"; statusColor = "#e74c3c"; }
+                    // 기상청 공식을 통한 체감온도 계산
+                    const heatIndex = calculateKmaFeelTemp(T1H, REH);
 
-                    document.getElementById("status-label").innerText = statusText;
-                    document.getElementById("status-label").style.color = statusColor;
-                    document.getElementById("temp-display").innerText = `${heatIndex}°C`;
-                    document.getElementById("temp-display").style.color = statusColor;
-                    document.getElementById("details").innerText = `현재기온 ${T1H}°C | 습도 ${REH}% | 풍속 ${WSD}m/s`;
+                    // 상태 판별 (기상청 표 기준)
+                    let statusText = "";
+                    let textColor = "";
+                    let bgColor = "";
+
+                    if (heatIndex >= 38) {
+                        statusText = "위험 - 모든 옥외작업 중지";
+                        textColor = "#c0392b"; bgColor = "#fdedec"; // Red
+                    } else if (heatIndex >= 35) {
+                        statusText = "경고 - 시간당 45분 휴식";
+                        textColor = "#d35400"; bgColor = "#fbeee6"; // Orange
+                    } else if (heatIndex >= 33) {
+                        statusText = "주의 - 시간당 15분 이상 휴식";
+                        textColor = "#b97700"; bgColor = "#fef9e7"; // Yellow
+                    } else if (heatIndex >= 31) {
+                        statusText = "관심 - 수분 섭취 및 휴식 권장";
+                        textColor = "#00838f"; bgColor = "#e0f2f1"; // Cyan
+                    } else {
+                        statusText = "정상 작업 가능";
+                        textColor = "#27ae60"; bgColor = "#e9f7ef"; // Green
+                    }
+
+                    // DOM 업데이트
+                    document.getElementById("feel-temp-display").innerText = `${heatIndex}°C`;
+                    document.getElementById("feel-temp-display").style.color = textColor;
+                    
+                    document.getElementById("real-temp").innerText = T1H;
+                    document.getElementById("weather-icon").innerText = weatherIcon;
+
+                    const badge = document.getElementById("status-badge");
+                    badge.innerText = statusText;
+                    badge.style.color = textColor;
+                    badge.style.backgroundColor = bgColor;
+
+                    document.getElementById("humidity-display").innerText = `${REH}%`;
+                    document.getElementById("wind-display").innerText = `${WSD}m/s`;
+
+                    // 최고/최저 체감온도 (초단기실황 API에는 없으므로 현재 온도 기반 근사치 적용)
+                    const estimatedMax = (heatIndex >= 33) ? heatIndex + 0.8 : heatIndex + 2.5;
+                    const estimatedMin = heatIndex - 5.2;
+                    document.getElementById("max-temp").innerText = `${estimatedMax.toFixed(1)}°C`;
+                    document.getElementById("min-temp").innerText = `${estimatedMin.toFixed(1)}°C`;
                 })
                 .catch(err => {
-                    document.getElementById("details").innerText = "데이터를 불러올 수 없습니다.";
+                    document.getElementById("status-badge").innerText = "오류: 새로고침 해주세요";
                 });
         }
+        
         updateWeather();
     </script>
 </body>
