@@ -2,16 +2,40 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <!-- 모바일 화면 최적화 설정 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>현장 체감온도</title>
     <style>
-        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f2f5; font-family: 'Pretendard', sans-serif; margin: 0; }
-        #weather-box { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 400px; }
+        body { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            background: #f0f2f5; 
+            font-family: 'Pretendard', sans-serif; 
+            margin: 0; 
+        }
+        #weather-box { 
+            background: white; 
+            padding: 2.5rem; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            text-align: center; 
+            width: 90%; 
+            max-width: 450px; 
+        }
         
-        /* 레이아웃 정렬 */
-        h1 { color: #2c3e50; font-size: 1.4rem; margin-bottom: 20px; }
-        #status-label { font-size: 1.2rem; font-weight: bold; margin: 0; }
-        #temp-display { font-size: 4rem; font-weight: 800; margin: 10px 0; }
-        #details { color: #7f8c8d; font-size: 0.9rem; border-top: 1px solid #eee; padding-top: 15px; margin-top: 10px; }
+        /* 레이아웃 디자인 개선 */
+        h1 { color: #2c3e50; font-size: 1.5rem; margin-bottom: 25px; line-height: 1.4; }
+        #status-label { font-size: 1.4rem; font-weight: bold; margin: 0; }
+        #temp-display { font-size: 5rem; font-weight: 800; margin: 15px 0; }
+        #details { 
+            color: #7f8c8d; 
+            font-size: 1rem; 
+            border-top: 1px solid #eee; 
+            padding-top: 20px; 
+            margin-top: 15px; 
+        }
     </style>
 </head>
 <body>
@@ -59,6 +83,9 @@
                     document.getElementById("temp-display").innerText = `${heatIndex}°C`;
                     document.getElementById("temp-display").style.color = statusColor;
                     document.getElementById("details").innerText = `현재기온 ${T1H}°C | 습도 ${REH}% | 풍속 ${WSD}m/s`;
+                })
+                .catch(err => {
+                    document.getElementById("details").innerText = "데이터를 불러올 수 없습니다.";
                 });
         }
         updateWeather();
