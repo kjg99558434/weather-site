@@ -13,14 +13,12 @@
     </style>
 </head>
 <body class="flex justify-center min-h-screen p-4">
-
     <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col">
         
         <div class="bg-blue-900 text-white p-5 text-center relative">
             <h1 class="text-2xl font-extrabold tracking-tight">써밋클라비온현장</h1>
             <p class="text-blue-200 mt-1 text-sm font-medium">일일 안전·보건 TBM 공지</p>
-            <div class="mt-3 inline-block bg-blue-800 rounded-full px-4 py-1 text-sm font-bold" id="today-date">
-                </div>
+            <div class="mt-3 inline-block bg-blue-800 rounded-full px-4 py-1 text-sm font-bold" id="today-date"></div>
         </div>
 
         <div class="p-5 space-y-6">
@@ -42,12 +40,8 @@
                 <div id="risk-card" class="bg-gray-100 rounded-xl p-4 text-center border-l-4 border-gray-400 shadow-sm">
                     <p class="text-sm text-gray-600 mb-1">예상 최고 체감온도</p>
                     <p class="text-3xl font-bold text-gray-800 mb-2" id="max-temp">--℃</p>
-                    <div class="inline-block px-3 py-1 rounded text-white font-bold bg-gray-400 mb-3" id="risk-badge">
-                        데이터 대기중
-                    </div>
-                    <p class="text-sm font-medium text-gray-700 bg-white p-2 rounded" id="risk-guide">
-                        날씨 데이터를 분석 중입니다.
-                    </p>
+                    <div class="inline-block px-3 py-1 rounded text-white font-bold bg-gray-400 mb-3" id="risk-badge">데이터 대기중</div>
+                    <p class="text-sm font-medium text-gray-700 bg-white p-2 rounded" id="risk-guide">날씨 데이터를 분석 중입니다.</p>
                 </div>
             </section>
 
@@ -73,7 +67,7 @@
         </div>
         
         <div class="bg-gray-50 p-4 text-center text-xs text-gray-400">
-            Powered by KMA 기상청 API & GitHub Pages<br>
+            Powered by KMA 기상청 API & Vercel<br>
             써밋클라비온현장 안전관리팀
         </div>
     </div>
@@ -83,21 +77,18 @@
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
-        const todayStr = `${year}년 ${month}월 ${day}일`;
-        document.getElementById('today-date').innerText = todayStr;
+        document.getElementById('today-date').innerText = `${year}년 ${month}월 ${day}일`;
 
         const API_KEY = decodeURIComponent("28995c1bbe4e734196be4efa91be0792789458ffc3d89d9abf04ac9df4d5abdb");
         const nx = 59;
         const ny = 125;
         
         let baseDate = `${year}${month}${day}`;
-        const baseTime = "0500";
-
         if (now.getHours() < 5) {
             const yesterday = new Date(now.setDate(now.getDate() - 1));
             baseDate = `${yesterday.getFullYear()}${String(yesterday.getMonth() + 1).padStart(2, '0')}${String(yesterday.getDate()).padStart(2, '0')}`;
         }
-
+        const baseTime = "0500";
         const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey=${encodeURIComponent(API_KEY)}&pageNo=1&numOfRows=300&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`;
 
         fetch(url)
@@ -126,34 +117,26 @@
                     const hum = weatherData[time].humidity;
                     
                     let feelsLike = temp;
-                    if (temp >= 33) {
-                        feelsLike = temp + (hum - 50) * 0.05;
-                    }
+                    if (temp >= 33) feelsLike = temp + (hum - 50) * 0.05;
                     feelsLike = Math.round(feelsLike * 10) / 10;
-                    
                     if (feelsLike > maxFeelsLike) maxFeelsLike = feelsLike;
 
-                    const card = `
+                    container.innerHTML += `
                         <div class="flex-shrink-0 bg-blue-50 rounded-lg p-3 w-20 text-center border border-blue-100">
                             <p class="text-xs font-bold text-blue-800 mb-1">${time}시</p>
                             <p class="text-lg font-bold text-gray-800">${temp}℃</p>
                             <p class="text-[10px] text-gray-500">습도 ${hum}%</p>
                         </div>
                     `;
-                    container.innerHTML += card;
                 });
-
                 updateRiskLevel(maxFeelsLike);
             })
             .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('weather-container').innerHTML = 
-                    `<p class="text-red-500 text-sm">데이터를 불러오지 못했습니다. API 키 활성화 상태를 확인해 주세요.</p>`;
+                document.getElementById('weather-container').innerHTML = `<p class="text-red-500 text-sm">데이터를 불러오지 못했습니다.</p>`;
             });
 
         function updateRiskLevel(maxTemp) {
             document.getElementById('max-temp').innerText = `${maxTemp}℃`;
-            
             const card = document.getElementById('risk-card');
             const badge = document.getElementById('risk-badge');
             const guide = document.getElementById('risk-guide');
