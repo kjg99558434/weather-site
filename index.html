@@ -78,7 +78,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .grid-item {
@@ -104,6 +104,69 @@
             font-weight: 800;
             color: #111;
         }
+
+        /* [추가] 온도별 휴식 기준 섹션 */
+        .rest-section {
+            margin-bottom: 25px;
+            display: none; /* 데이터 로드 전 숨김 */
+        }
+        .rest-guideline {
+            font-size: 0.95rem;
+            color: #333;
+            line-height: 1.6;
+            background: #fff;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #eee;
+            text-align: left;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .rest-guideline strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        .rest-item {
+            display: flex;
+            margin-bottom: 4px;
+        }
+        .rest-item:last-child {
+            margin-bottom: 0;
+        }
+        .rest-item .time { font-weight: 700; width: 70px; flex-shrink: 0; color: #555; }
+
+        /* [추가] 5대 예방수칙 섹션 (항시 노출) */
+        .rules-section {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        .action-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #222;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .basic-rules {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .rule-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px 8px;
+            text-align: center;
+        }
+        .rule-item.full {
+            grid-column: span 2;
+        }
+        .rule-icon { font-size: 1.8rem; margin-bottom: 5px; }
+        .rule-name { font-weight: 800; font-size: 1rem; color: #111; margin-bottom: 4px; }
+        .rule-desc { font-size: 0.75rem; color: #0066cc; word-break: keep-all; line-height: 1.3; }
 
         /* 하단 문구 */
         .footer {
@@ -147,6 +210,42 @@
             </div>
         </div>
 
+        <div id="rest-section" class="rest-section">
+            <div class="rest-guideline" id="rest-guideline">
+                </div>
+        </div>
+
+        <div class="rules-section">
+            <div class="action-title">[온열질환 예방 5대 기본수칙]</div>
+            <div class="basic-rules">
+                <div class="rule-item">
+                    <div class="rule-icon">💧</div>
+                    <div class="rule-name">물</div>
+                    <div class="rule-desc">시원하고 깨끗한 물 제공</div>
+                </div>
+                <div class="rule-item">
+                    <div class="rule-icon">⛱️</div>
+                    <div class="rule-name">그늘</div>
+                    <div class="rule-desc">냉방시설 / 휴게시설 설치</div>
+                </div>
+                <div class="rule-item">
+                    <div class="rule-icon">🌳</div>
+                    <div class="rule-name">휴식</div>
+                    <div class="rule-desc">체감온도에 따른 휴식 제공</div>
+                </div>
+                <div class="rule-item">
+                    <div class="rule-icon">❄️</div>
+                    <div class="rule-name">보냉장구</div>
+                    <div class="rule-desc">아이스조끼 등 개인 장구</div>
+                </div>
+                <div class="rule-item full">
+                    <div class="rule-icon">🚑</div>
+                    <div class="rule-name">응급조치</div>
+                    <div class="rule-desc">의식 없을 경우 지체 없이 119 신고</div>
+                </div>
+            </div>
+        </div>
+
         <div class="footer">
             ※ 기상청 격자 (nx:59, ny:125) 기준 · 현장 개별 좌표 적용
         </div>
@@ -157,7 +256,6 @@
         const NX = "59";
         const NY = "125";
 
-        // 기상청 표준 체감온도 산출 공식
         function calculateKmaFeelTemp(Ta, RH) {
             const Tw = Ta * Math.atan(0.151977 * Math.pow(RH + 8.313659, 0.5)) 
                      + Math.atan(Ta + RH) 
@@ -178,8 +276,6 @@
         function updateWeather() {
             const now = new Date();
             
-            // [버그 수정] 기상청 초단기실황은 매시 40분에 발표됩니다.
-            // 40분 전이면 이전 시간 데이터를 요청하도록 안전하게 처리하고 대한민국 현지 시간을 기반으로 파싱합니다.
             if (now.getMinutes() < 40) {
                 now.setHours(now.getHours() - 1);
             }
@@ -206,10 +302,10 @@
                     const items = data.response.body.items.item;
                     const findValue = (cat) => items.find(i => i.category === cat)?.obsrValue || 0;
                     
-                    const T1H = parseFloat(findValue("T1H")); // 기온
-                    const REH = parseFloat(findValue("REH")); // 습도
-                    const WSD = parseFloat(findValue("WSD")); // 풍속
-                    const PTY = parseInt(findValue("PTY"));   // 강수형태
+                    const T1H = parseFloat(findValue("T1H")); 
+                    const REH = parseFloat(findValue("REH")); 
+                    const WSD = parseFloat(findValue("WSD")); 
+                    const PTY = parseInt(findValue("PTY"));   
 
                     let weatherIcon = "맑음 ☀️";
                     if(PTY === 1 || PTY === 5) weatherIcon = "비 🌧️";
@@ -219,26 +315,52 @@
                     const heatIndex = calculateKmaFeelTemp(T1H, REH);
 
                     let statusText = "";
+                    let restHtml = "";
                     let textColor = "";
                     let bgColor = "";
 
+                    // 실시간 체감온도 기준 - 현장 맞춤형 휴식 안내문 매칭
                     if (heatIndex >= 38) {
-                        statusText = "위험 - 모든 옥외작업 중지";
+                        statusText = "위험";
                         textColor = "#c0392b"; bgColor = "#fdedec";
+                        restHtml = `
+                            <strong style="color:#c0392b;">🚨 현재 온도 휴식 기준 (위험)</strong>
+                            <div style="font-weight:700; font-size:1.05rem; margin-top:5px;">긴급조치를 제외한 옥외작업 중지</div>
+                        `;
                     } else if (heatIndex >= 35) {
-                        statusText = "경고 - 시간당 45분 휴식";
+                        statusText = "경고";
                         textColor = "#d35400"; bgColor = "#fbeee6";
+                        restHtml = `
+                            <strong style="color:#d35400;">⚠️ 현재 온도 휴식 기준 (경고)</strong>
+                            <div class="rest-item"><div class="time">07~14시</div> <div>매시간 정각부터 20분간 휴식</div></div>
+                            <div class="rest-item"><div class="time">14~17시</div> <div style="font-weight:700; color:#d35400;">옥외작업 최소화</div></div>
+                        `;
                     } else if (heatIndex >= 33) {
-                        statusText = "주의 - 시간당 15분 이상 휴식";
+                        statusText = "주의";
                         textColor = "#b97700"; bgColor = "#fef9e7";
+                        restHtml = `
+                            <strong style="color:#b97700;">⚠️ 현재 온도 휴식 기준 (주의)</strong>
+                            <div class="rest-item"><div class="time">07~14시</div> <div>매시간 정각부터 15분간 휴식</div></div>
+                            <div class="rest-item"><div class="time">14~17시</div> <div>매시간 정각부터 15분 <b>이상</b> 휴식</div></div>
+                        `;
                     } else if (heatIndex >= 31) {
-                        statusText = "관심 - 수분 섭취 및 휴식 권장";
+                        statusText = "관심";
                         textColor = "#00838f"; bgColor = "#e0f2f1";
+                        restHtml = `
+                            <strong style="color:#00838f;">ℹ️ 현재 온도 휴식 기준 (관심)</strong>
+                            <div class="rest-item"><div class="time">07~14시</div> <div>매시간 정각부터 10분간 휴식</div></div>
+                            <div class="rest-item"><div class="time">14~17시</div> <div>매시간 정각부터 15분간 휴식</div></div>
+                        `;
                     } else {
-                        statusText = "정상 작업 가능";
+                        statusText = "정상 작업";
                         textColor = "#27ae60"; bgColor = "#e9f7ef";
+                        restHtml = `
+                            <strong style="color:#27ae60;">✅ 현재 온도 휴식 기준 (정상)</strong>
+                            <div style="margin-top:5px;">일상적인 작업 진행 (수시로 시원한 물 섭취)</div>
+                        `;
                     }
 
+                    // UI 업데이트 및 색상 동기화
                     document.getElementById("feel-temp-display").innerText = `${heatIndex}°C`;
                     document.getElementById("feel-temp-display").style.color = textColor;
                     
@@ -246,7 +368,7 @@
                     document.getElementById("weather-icon").innerText = weatherIcon;
 
                     const badge = document.getElementById("status-badge");
-                    badge.innerText = statusText;
+                    badge.innerText = `${statusText} 단계`;
                     badge.style.color = textColor;
                     badge.style.backgroundColor = bgColor;
 
@@ -257,6 +379,12 @@
                     const estimatedMin = heatIndex - 5.2;
                     document.getElementById("max-temp").innerText = `${estimatedMax.toFixed(1)}°C`;
                     document.getElementById("min-temp").innerText = `${estimatedMin.toFixed(1)}°C`;
+
+                    // [추가 기능 데이터 삽입] 휴식 기준 박스 바인딩 및 노출
+                    const restGuidelineBox = document.getElementById("rest-guideline");
+                    restGuidelineBox.innerHTML = restHtml;
+                    restGuidelineBox.style.borderColor = textColor;
+                    document.getElementById('rest-section').style.display = 'block';
                 })
                 .catch(err => {
                     console.error(err);
